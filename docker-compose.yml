@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    container_name: hospital_db
+    restart: always
+    environment:
+      POSTGRES_USER: hospital_user
+      POSTGRES_PASSWORD: hospital_pass
+      POSTGRES_DB: hospital_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  streamlit:
+    build: .
+    container_name: hospital_app
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8501:8501"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=hospital_db
+      - DB_USER=hospital_user
+      - DB_PASS=hospital_pass
+    volumes:
+      - ./app:/app
+      - ./data:/data
+
+volumes:
+  db_data:
